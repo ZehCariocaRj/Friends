@@ -1,4 +1,4 @@
-const PRUDPPacket = require('./prudp/packet.class');
+const PRUDPPacket = require('./lib/prudp/packet.class');
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 const port = 1300;
