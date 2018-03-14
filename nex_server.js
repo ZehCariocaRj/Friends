@@ -2,6 +2,7 @@ const PRUDPPacket = require('./lib/prudp/packet.class');
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 const port = 1300;
+const TYPES = require('./lib/prudp/types/packet.types');
 let logline = 0;
 
 server.on('error', (err) => {
@@ -15,9 +16,21 @@ server.on('message', (data, remote) => {
 	const packet = new PRUDPPacket(Buffer.from(data,'ascii').toString('hex'), 0);
 	packet.unpack();
 
-	console.log(`${logline}: ${remote.address}:${remote.port} - ${packet.data.type_string}; ${packet.data.flags}`);
+	console.log(`${logline}: ${remote.address}:${remote.port} - ${packet.data.type_string}; ${packet.data.flags}; ${packet.data.payload.decrypted}`);
 	
 	logline++;
+	
+	switch(packet.data.type){
+	case TYPES.SYN:
+		//send reply
+		server.send('a1af90000000000000000065d9e33400003e',remote.port,remote.address, (err) => {
+			//client.close();
+		});
+		break;
+	default:
+		console.log('Unknown type received.');
+		break;
+	}
 });
 
 server.on('listening', () => {
